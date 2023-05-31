@@ -1,4 +1,4 @@
-﻿using UpdateApi.Customer.Dtos;
+﻿using UpdateApi.Customer.Dtos.Output;
 using UpdateApi.Customer.Entities;
 
 namespace UpdateApi.Customer.Mappers;
@@ -6,10 +6,11 @@ namespace UpdateApi.Customer.Mappers;
 public static class CustomerMapper
 {
     public static CustomerDto Map(this CustomerEntity customerEntity) =>
-        new CustomerDto
+        new()
         {
             Id = customerEntity.Id,
             Name = customerEntity.Name,
+            Gender = customerEntity.Gender,
         };
 
     public static IEnumerable<CustomerDto> Map(this IEnumerable<CustomerEntity> customerEntities) =>

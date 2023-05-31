@@ -1,4 +1,5 @@
-﻿using UpdateApi.Customer.Entities;
+﻿using UpdateApi.Customer.Dtos.Input;
+using UpdateApi.Customer.Entities;
 
 namespace UpdateApi.Customer.Repositories;
 
@@ -46,5 +47,19 @@ public class CustomersRepository
     {
         return Customers
             .ToArray();
+    }
+    
+    public CustomerEntity? Update(int id, BrokenCustomerPutDto brokenCustomerPutDto)
+    {
+        var customer = Customers
+            .FirstOrDefault(x => x.Id == id);
+
+        if (customer == null)
+            return null;
+
+        customer.Name = brokenCustomerPutDto.Name;
+        customer.Gender = brokenCustomerPutDto.Gender;
+
+        return customer;
     }
 }
