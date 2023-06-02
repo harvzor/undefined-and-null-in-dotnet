@@ -37,17 +37,27 @@ public class CustomersController : ControllerBase
         return Ok(customer.Map());
     }
     
-    [HttpPut("{id:int}")]
-    public IActionResult PutCustomer([FromRoute] int id, [FromBody] BrokenCustomerPutDto brokenCustomerPutDto)
+    /// <summary>
+    /// Client can accidentally set `gender` to `null` by not sending the value (implicit null).
+    /// </summary>
+    [HttpPut("broken/{id:int}")]
+    public IActionResult BrokenUpdateCustomer([FromRoute] int id, [FromBody] BrokenCustomerPutDto brokenCustomerPutDto)
     {
-        if (!ModelState.IsValid)
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            // Handle validation errors
-            return BadRequest(errors);
-        }
-        
         var customer = _customersRepository.Update(id, brokenCustomerPutDto);
+
+        if (customer == null)
+            return NotFound();
+        
+        return Ok(customer.Map());
+    }
+    
+    /// <summary>
+    /// DotNext.Optional doesn't allow me to use `[Required]` to ensure not undefined.
+    /// </summary>
+    [HttpPut("dotnextoptional/{id:int}")]
+    public IActionResult DotNextOptionalUpdateCustomer([FromRoute] int id, [FromBody] DotNextOptionalCustomerPutDto dotNextOptionalCustomerPutDto)
+    {
+        var customer = _customersRepository.Update(id, dotNextOptionalCustomerPutDto);
 
         if (customer == null)
             return NotFound();
