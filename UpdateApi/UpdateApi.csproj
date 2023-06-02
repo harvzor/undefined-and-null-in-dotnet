@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <PackageReference Include="DotNext" Version="4.12.1" />
+      <PackageReference Include="Morcatko.AspNetCore.JsonMergePatch.SystemText" Version="6.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 

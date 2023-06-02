@@ -34,19 +34,39 @@ public class CustomersRepository
     
     public void Add(CustomerEntity customer)
     {
-        Customers.Add(customer);
+        Customers.Add(customer.Clone());
     }
     
     public CustomerEntity? Find(int id)
     {
-        return Customers
+        var customer = Customers
             .FirstOrDefault(x => x.Id == id);
+
+        if (customer == null)
+            return customer;
+
+        return customer.Clone();
     }
 
     public CustomerEntity[] GetAll()
     {
         return Customers
+            .Select(x => x.Clone())
             .ToArray();
+    }
+    
+    public CustomerEntity? Update(CustomerEntity updateCustomer)
+    {
+        var customer = Customers
+            .FirstOrDefault(x => x.Id == updateCustomer.Id);
+        
+        if (customer == null)
+            return null;
+
+        customer.Name = updateCustomer.Name;
+        customer.Gender = updateCustomer.Gender;
+        
+        return customer;
     }
     
     public CustomerEntity? Update(int id, BrokenCustomerPutDto brokenCustomerPutDto)
@@ -60,7 +80,7 @@ public class CustomersRepository
         customer.Name = brokenCustomerPutDto.Name;
         customer.Gender = brokenCustomerPutDto.Gender;
 
-        return customer;
+        return customer.Clone();
     }
     
     public CustomerEntity? Update(int id, DotNextOptionalCustomerPutDto dotNextOptionalCustomerPutDto)
@@ -76,6 +96,6 @@ public class CustomersRepository
         if (dotNextOptionalCustomerPutDto.Gender.HasValue)
             customer.Gender = dotNextOptionalCustomerPutDto.Gender.OrDefault();
 
-        return customer;
+        return customer.Clone();
     }
 }

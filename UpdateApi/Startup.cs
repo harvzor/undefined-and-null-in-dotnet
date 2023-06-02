@@ -1,4 +1,7 @@
-﻿namespace UpdateApi;
+﻿using Morcatko.AspNetCore.JsonMergePatch;
+using UpdateApi.Filters;
+
+namespace UpdateApi;
 
 public class Startup
 {
@@ -15,9 +18,16 @@ public class Startup
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
+        services
+            .AddMvc()
+            .AddSystemTextJsonMergePatch();
+        
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.OperationFilter<JsonMergePatchDocumentOperationFilter>();
+        });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

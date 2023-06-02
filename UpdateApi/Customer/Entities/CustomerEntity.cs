@@ -6,4 +6,9 @@ public class CustomerEntity
     public string Name { get; set; }
     
     public string? Gender { get; set; }
+
+    public CustomerEntity Clone()
+    {
+        return (CustomerEntity)MemberwiseClone();
+    }
 }

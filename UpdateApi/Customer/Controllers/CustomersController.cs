@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Customer.Dtos.Input;
 using UpdateApi.Customer.Mappers;
 using UpdateApi.Customer.Repositories;
@@ -61,6 +62,28 @@ public class CustomersController : ControllerBase
 
         if (customer == null)
             return NotFound();
+        
+        return Ok(customer.Map());
+    }
+    
+    /// <summary>
+    /// Using Morcatko.AspNetCore.JsonMergePatch
+    /// </summary>
+    [HttpPatch("morcatko/{id:int}")]
+    [Consumes(JsonMergePatchDocument.ContentType)]
+    public IActionResult MorcatkoPatch([FromRoute] int id, [FromBody] JsonMergePatchDocument<MorcatkoPatchCustomerDto> patch)
+    {
+        var customer = _customersRepository.Find(id);
+        
+        if (customer == null)
+            return NotFound();
+
+        customer = patch.ApplyToT(customer);
+
+        customer = _customersRepository.Update(customer);
+
+        if (customer == null)
+            return StatusCode(500);
         
         return Ok(customer.Map());
     }
