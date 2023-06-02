@@ -11,6 +11,7 @@ public static class CustomerMapper
             Id = customerEntity.Id,
             Name = customerEntity.Name,
             Gender = customerEntity.Gender,
+            DeletedDate = customerEntity.DeletedDate,
         };
 
     public static IEnumerable<CustomerDto> Map(this IEnumerable<CustomerEntity> customerEntities) =>

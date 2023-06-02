@@ -41,7 +41,9 @@ public class CustomersController : ControllerBase
     }
     
     /// <summary>
-    /// Client can accidentally set `gender` to `null` by not sending the value (implicit null).
+    /// Issues:
+    /// - client can accidentally set `gender` to `null` by not sending the value (implicit null)
+    /// - client can accidentally undelete by not setting `delete` to `true` (implicit false)
     /// </summary>
     [HttpPut("broken/{id:int}")]
     public IActionResult BrokenUpdateCustomer([FromRoute] int id, [FromBody] BrokenCustomerPutDto brokenCustomerPutDto)
@@ -53,6 +55,7 @@ public class CustomersController : ControllerBase
         
         customer.Name = brokenCustomerPutDto.Name;
         customer.Gender = brokenCustomerPutDto.Gender;
+        customer.Delete(brokenCustomerPutDto.Deleted);
         
         customer = _customersRepository.Update(customer);
         
@@ -78,6 +81,8 @@ public class CustomersController : ControllerBase
         if (dotNextOptionalCustomerPutDto.Gender.HasValue)
             customer.Gender = dotNextOptionalCustomerPutDto.Gender.OrDefault();
         
+        customer.Delete(dotNextOptionalCustomerPutDto.Deleted);
+        
         customer = _customersRepository.Update(customer);
         
         if (customer == null)
@@ -101,8 +106,35 @@ public class CustomersController : ControllerBase
         if (customer == null)
             return NotFound();
     
-        customer = patch.ApplyToT(customer);
-    
+        // Can't use if my DTO doesn't map to the target 100%.
+        // Deleted does not map to DeletedDate.
+        // customer = patch.ApplyToT(customer);
+        
+        // Now I lose out on nice strong typing:
+        var nameOperation = patch.Operations
+            .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Name), StringComparison.OrdinalIgnoreCase));
+        if (nameOperation != null)
+        {
+            var name = (string)nameOperation.value;
+            customer.Name = name;
+        }
+        
+        var genderOperation = patch.Operations
+            .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Gender), StringComparison.OrdinalIgnoreCase));
+        if (genderOperation != null)
+        {
+            var gender = (string?)genderOperation.value;
+            customer.Gender = gender;
+        }
+
+        var deleteOperation = patch.Operations
+            .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Deleted), StringComparison.OrdinalIgnoreCase));
+        if (deleteOperation != null)
+        {
+            var deleted = (bool)deleteOperation.value;
+            customer.Delete(deleted);
+        }
+        
         customer = _customersRepository.Update(customer);
     
         if (customer == null)

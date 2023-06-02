@@ -6,4 +6,6 @@ public class CustomerDto
     public string Name { get; set; }
     
     public string? Gender { get; set; }
+    
+    public DateTimeOffset? DeletedDate { get; set; }
 }

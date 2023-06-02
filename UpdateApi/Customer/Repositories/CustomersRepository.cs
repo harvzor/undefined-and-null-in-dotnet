@@ -16,18 +16,21 @@ public class CustomersRepository
             {
                 Id = 1,
                 Name = "A",
+                DeletedDate = null,
             });
             
             Add(new CustomerEntity()
             {
                 Id = 2,
                 Name = "B",
+                DeletedDate = null,
             });
             
             Add(new CustomerEntity()
             {
                 Id = 3,
                 Name = "C",
+                DeletedDate = null,
             });
         }
     }
@@ -65,6 +68,7 @@ public class CustomersRepository
 
         customer.Name = updateCustomer.Name;
         customer.Gender = updateCustomer.Gender;
+        customer.DeletedDate = updateCustomer.DeletedDate;
         
         return customer;
     }

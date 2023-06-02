@@ -29,4 +29,7 @@ public class DotNextOptionalCustomerPutDto
     // [Required]
     // [OptionalRequired]
     public Optional<string?> Gender { get; set; }
+    
+    // [Required] // Required doesn't work unless I make it `bool?`, but then I have to handle it being null in my code, even though it can't be.
+    public bool Deleted { get; set; }
 }
