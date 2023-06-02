@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
 using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Customer.Dtos.Input;
 using UpdateApi.Customer.Mappers;
@@ -8,6 +9,7 @@ namespace UpdateApi.Customer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Consumes(MediaTypeNames.Application.Json)]
 public class CustomersController : ControllerBase
 {
     private readonly CustomersRepository _customersRepository;
@@ -87,6 +89,9 @@ public class CustomersController : ControllerBase
     /// <summary>
     /// Using Morcatko.AspNetCore.JsonMergePatch
     /// </summary>
+    /// <remarks>
+    /// Adding `.AddSystemTextJsonMergePatch();` causes Swagger to default to `application/merge-patch+json` so added `[Consumes(MediaTypeNames.Application.Json)]` to the class so everything else only accepts normal JSON.
+    /// </remarks>
     [HttpPatch("morcatko/{id:int}")]
     [Consumes(JsonMergePatchDocument.ContentType)]
     public IActionResult MorcatkoPatch([FromRoute] int id, [FromBody] JsonMergePatchDocument<MorcatkoPatchCustomerDto> patch)

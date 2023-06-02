@@ -24,6 +24,7 @@ public class Startup
         
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
         services.AddSwaggerGen(c =>
         {
             c.OperationFilter<JsonMergePatchDocumentOperationFilter>();
