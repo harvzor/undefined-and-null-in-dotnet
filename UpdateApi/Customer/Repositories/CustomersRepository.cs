@@ -68,34 +68,4 @@ public class CustomersRepository
         
         return customer;
     }
-    
-    public CustomerEntity? Update(int id, BrokenCustomerPutDto brokenCustomerPutDto)
-    {
-        var customer = Customers
-            .FirstOrDefault(x => x.Id == id);
-
-        if (customer == null)
-            return null;
-
-        customer.Name = brokenCustomerPutDto.Name;
-        customer.Gender = brokenCustomerPutDto.Gender;
-
-        return customer.Clone();
-    }
-    
-    public CustomerEntity? Update(int id, DotNextOptionalCustomerPutDto dotNextOptionalCustomerPutDto)
-    {
-        var customer = Customers
-            .FirstOrDefault(x => x.Id == id);
-
-        if (customer == null)
-            return null;
-
-        customer.Name = dotNextOptionalCustomerPutDto.Name;
-        
-        if (dotNextOptionalCustomerPutDto.Gender.HasValue)
-            customer.Gender = dotNextOptionalCustomerPutDto.Gender.OrDefault();
-
-        return customer.Clone();
-    }
 }

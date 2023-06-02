@@ -44,10 +44,18 @@ public class CustomersController : ControllerBase
     [HttpPut("broken/{id:int}")]
     public IActionResult BrokenUpdateCustomer([FromRoute] int id, [FromBody] BrokenCustomerPutDto brokenCustomerPutDto)
     {
-        var customer = _customersRepository.Update(id, brokenCustomerPutDto);
+        var customer = _customersRepository.Find(id);
 
         if (customer == null)
             return NotFound();
+        
+        customer.Name = brokenCustomerPutDto.Name;
+        customer.Gender = brokenCustomerPutDto.Gender;
+        
+        customer = _customersRepository.Update(customer);
+        
+        if (customer == null)
+            return StatusCode(500);
         
         return Ok(customer.Map());
     }
@@ -58,10 +66,20 @@ public class CustomersController : ControllerBase
     [HttpPut("dotnextoptional/{id:int}")]
     public IActionResult DotNextOptionalUpdateCustomer([FromRoute] int id, [FromBody] DotNextOptionalCustomerPutDto dotNextOptionalCustomerPutDto)
     {
-        var customer = _customersRepository.Update(id, dotNextOptionalCustomerPutDto);
+        var customer = _customersRepository.Find(id);
 
         if (customer == null)
             return NotFound();
+        
+        customer.Name = dotNextOptionalCustomerPutDto.Name;
+        
+        if (dotNextOptionalCustomerPutDto.Gender.HasValue)
+            customer.Gender = dotNextOptionalCustomerPutDto.Gender.OrDefault();
+        
+        customer = _customersRepository.Update(customer);
+        
+        if (customer == null)
+            return StatusCode(500);
         
         return Ok(customer.Map());
     }
@@ -77,11 +95,11 @@ public class CustomersController : ControllerBase
         
         if (customer == null)
             return NotFound();
-
+    
         customer = patch.ApplyToT(customer);
-
+    
         customer = _customersRepository.Update(customer);
-
+    
         if (customer == null)
             return StatusCode(500);
         
