@@ -72,7 +72,7 @@ public class CustomersController : ControllerBase
     public IActionResult DotNextOptionalUpdateCustomer([FromRoute] int id, [FromBody] DotNextOptionalCustomerPutDto dotNextOptionalCustomerPutDto)
     {
         var customer = _customersRepository.Find(id);
-
+    
         if (customer == null)
             return NotFound();
         
@@ -126,7 +126,7 @@ public class CustomersController : ControllerBase
             var gender = (string?)genderOperation.value;
             customer.Gender = gender;
         }
-
+    
         var deleteOperation = patch.Operations
             .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Deleted), StringComparison.OrdinalIgnoreCase));
         if (deleteOperation != null)
@@ -135,6 +135,36 @@ public class CustomersController : ControllerBase
             customer.Delete(deleted);
         }
         
+        customer = _customersRepository.Update(customer);
+    
+        if (customer == null)
+            return StatusCode(500);
+        
+        return Ok(customer.Map());
+    }
+    
+    /// <summary>
+    /// Using Harvzor.Optional
+    /// </summary>
+    [HttpPatch("harvzor-optional/{id:int}")]
+    // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
+    [Consumes(MediaTypeNames.Application.Json)]
+    public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HarvzorOptionalCustomerPatchDto patch)
+    {
+        var customer = _customersRepository.Find(id);
+        
+        if (customer == null)
+            return NotFound();
+
+        if (patch.Name.IsDefined)
+            customer.Name = patch.Name.Value;
+        
+        if (patch.Gender.IsDefined)
+            customer.Gender = patch.Gender.Value;
+        
+        if (patch.Deleted.IsDefined)
+            customer.Delete(patch.Deleted.Value);
+
         customer = _customersRepository.Update(customer);
     
         if (customer == null)

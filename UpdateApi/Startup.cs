@@ -1,4 +1,7 @@
-﻿using Morcatko.AspNetCore.JsonMergePatch;
+﻿using Harvzor.Optional;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Filters;
 
 namespace UpdateApi;
@@ -22,12 +25,30 @@ public class Startup
             .AddMvc()
             .AddSystemTextJsonMergePatch();
         
-        services.AddControllers();
+        services
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new Harvzor.Optional.SystemTextJson.OptionalJsonConverter());
+            });
+        
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-        services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(options =>
         {
-            c.OperationFilter<JsonMergePatchDocumentOperationFilter>();
+            // options.OperationFilter<JsonMergePatchDocumentOperationFilter>();
+            
+            // Solves issue with DotNext Optional and Harvzor Optional colliding.
+            options.CustomSchemaIds(type => type.ToString());
+            
+            options.MapType<Optional<string>>(() => new OpenApiSchema
+            {
+                Type = "string"
+            });
+            
+            options.MapType<Optional<bool>>(() => new OpenApiSchema
+            {
+                Type = "boolean"
+            });
         });
     }
 

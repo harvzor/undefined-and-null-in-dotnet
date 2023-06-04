@@ -19,4 +19,13 @@
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Harvzor.Optional">
+        <HintPath>bin\Debug\net7.0\Harvzor.Optional.dll</HintPath>
+      </Reference>
+      <Reference Include="Harvzor.Optional.SystemTextJson">
+        <HintPath>..\..\Harvzor.Optional\Harvzor.Optional.SystemTextJson\bin\Debug\netstandard2.0\Harvzor.Optional.SystemTextJson.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
