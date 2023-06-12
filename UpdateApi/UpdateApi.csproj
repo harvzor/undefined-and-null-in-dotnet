@@ -21,10 +21,10 @@
 
     <ItemGroup>
       <Reference Include="Harvzor.Optional">
-        <HintPath>bin\Debug\net7.0\Harvzor.Optional.dll</HintPath>
+        <HintPath>..\..\Harvzor.Optional\src\Harvzor.Optional\bin\Debug\netstandard2.0\Harvzor.Optional.dll</HintPath>
       </Reference>
       <Reference Include="Harvzor.Optional.SystemTextJson">
-        <HintPath>..\..\Harvzor.Optional\Harvzor.Optional.SystemTextJson\bin\Debug\netstandard2.0\Harvzor.Optional.SystemTextJson.dll</HintPath>
+        <HintPath>..\..\Harvzor.Optional\src\Harvzor.Optional.SystemTextJson\bin\Debug\netstandard2.0\Harvzor.Optional.SystemTextJson.dll</HintPath>
       </Reference>
     </ItemGroup>
 
