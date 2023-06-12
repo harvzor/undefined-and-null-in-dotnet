@@ -1,4 +1,7 @@
 ﻿using Harvzor.Optional;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Filters;
@@ -25,7 +28,12 @@ public class Startup
             .AddSystemTextJsonMergePatch();
         
         services
-            .AddControllers()
+            .AddControllers(options =>
+            {
+                // Microsoft's solution for getting JSON PATCH to work in a solution that mostly used JSON.NET
+                // https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 
+                options.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
+            })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new Harvzor.Optional.SystemTextJson.OptionalJsonConverter());
@@ -63,5 +71,24 @@ public class Startup
         app.UseRouting();
         
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+    }
+    
+    private static class MyJPIF
+    {
+        public static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
+        {
+            var builder = new ServiceCollection()
+                .AddLogging()
+                .AddMvc()
+                .AddNewtonsoftJson()
+                .Services.BuildServiceProvider();
+
+            return builder
+                .GetRequiredService<IOptions<MvcOptions>>()
+                .Value
+                .InputFormatters
+                .OfType<NewtonsoftJsonPatchInputFormatter>()
+                .First();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Customer.Dtos.Input;
@@ -92,6 +93,30 @@ public class CustomersController : ControllerBase
     }
     
     /// <summary>
+    /// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0
+    /// This should work, but the Swagger docs will all be broken with no clear fix: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/2094
+    /// </summary>
+    [HttpPatch("{id:int}")]
+    [Consumes("application/json-patch+json ")]
+    public IActionResult Patch([FromRoute] int id, [FromBody] JsonPatchDocument<MicrosoftPatchCustomerDto> patch)
+    {
+        var customer = _customersRepository.Find(id);
+        
+        if (customer == null)
+            return NotFound();
+        
+        // Cannot apply to different model.
+        // customer = patch.ApplyTo(customer);
+        
+        customer = _customersRepository.Update(customer);
+    
+        if (customer == null)
+            return StatusCode(500);
+        
+        return Ok(customer.Map());
+    }
+    
+    /// <summary>
     /// Using Morcatko.AspNetCore.JsonMergePatch
     /// </summary>
     /// <remarks>
@@ -110,7 +135,8 @@ public class CustomersController : ControllerBase
         // Deleted does not map to DeletedDate.
         // customer = patch.ApplyToT(customer);
         
-        // Now I lose out on nice strong typing:
+        // This is JSON Merge PATCH so I don't need to look out for operations that aren't matching Replace.
+        // I lose out on nice strong typing:
         var nameOperation = patch.Operations
             .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Name), StringComparison.OrdinalIgnoreCase));
         if (nameOperation != null)
