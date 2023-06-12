@@ -1,5 +1,4 @@
 ﻿using Harvzor.Optional;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Filters;
@@ -35,7 +34,7 @@ public class Startup
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            // options.OperationFilter<JsonMergePatchDocumentOperationFilter>();
+            options.OperationFilter<JsonMergePatchDocumentOperationFilter>();
             
             // Solves issue with DotNext Optional and Harvzor Optional colliding.
             options.CustomSchemaIds(type => type.ToString());
