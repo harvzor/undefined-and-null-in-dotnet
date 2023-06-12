@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Customer.Dtos.Input;
@@ -93,12 +92,46 @@ public class CustomersController : ControllerBase
     }
     
     /// <summary>
+    /// https://github.com/Havunen/SystemTextJsonPatch
+    /// Preferable to using Microsoft.AspNetCore.JsonPatch.JsonPatchDocument as it works well with System.Text.Json.
+    /// </summary>
+    [HttpPatch("Havunen/{id:int}")]
+    [Consumes("application/json-patch+json ")]
+    public IActionResult HavunenPatch([FromRoute] int id, [FromBody] SystemTextJsonPatch.JsonPatchDocument<HavunenPatchCustomerDto> patch)
+    {
+        var customer = _customersRepository.Find(id);
+        
+        if (customer == null)
+            return NotFound();
+        
+        // Cannot apply to different model.
+        // customer = patch.ApplyTo(customer);
+        
+        // Example of how to read the operations:
+        // All of the other properties would also have to be handled.
+        var nameOperation = patch.Operations
+            .Find(x => String.Equals(x.Path, "/" + nameof(MorcatkoPatchCustomerDto.Name), StringComparison.OrdinalIgnoreCase));
+        if (nameOperation != null)
+        {
+            var name = (string)nameOperation.Value;
+            customer.Name = name;
+        }
+        
+        customer = _customersRepository.Update(customer);
+    
+        if (customer == null)
+            return StatusCode(500);
+        
+        return Ok(customer.Map());
+    }
+    
+    /// <summary>
     /// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0
     /// This should work, but the Swagger docs will all be broken with no clear fix: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/2094
     /// </summary>
     [HttpPatch("{id:int}")]
     [Consumes("application/json-patch+json ")]
-    public IActionResult Patch([FromRoute] int id, [FromBody] JsonPatchDocument<MicrosoftPatchCustomerDto> patch)
+    public IActionResult Patch([FromRoute] int id, [FromBody] Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<MicrosoftPatchCustomerDto> patch)
     {
         var customer = _customersRepository.Find(id);
         

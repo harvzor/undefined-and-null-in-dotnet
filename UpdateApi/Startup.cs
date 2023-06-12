@@ -30,7 +30,7 @@ public class Startup
         services
             .AddControllers(options =>
             {
-                // Microsoft's solution for getting JSON PATCH to work in a solution that mostly used JSON.NET
+                // Microsoft's solution for getting JSON PATCH to work in a solution that mostly used System.Text.Json.
                 // https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 
                 options.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
             })
