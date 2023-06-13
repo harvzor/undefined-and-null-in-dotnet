@@ -1,6 +1,8 @@
 ﻿using System.Net.Mime;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Morcatko.AspNetCore.JsonMergePatch;
+using UpdateApi.Attributes;
 using UpdateApi.Customer.Dtos.Input;
 using UpdateApi.Customer.Mappers;
 using UpdateApi.Customer.Repositories;
@@ -194,6 +196,68 @@ public class CustomersController : ControllerBase
             customer.Delete(deleted);
         }
         
+        customer = _customersRepository.Update(customer);
+    
+        if (customer == null)
+            return StatusCode(500);
+        
+        return Ok(customer.Map());
+    }
+
+    private class BodyReader
+    {
+        private readonly JsonDocument _jsonDocument;
+        
+        public BodyReader(HttpRequest httpRequest)
+        {
+            httpRequest.Body.Seek(0, SeekOrigin.Begin);
+            
+            using var reader = new StreamReader(httpRequest.Body);
+            
+            var jsonPayload = reader.ReadToEnd();
+
+            _jsonDocument = JsonDocument.Parse(jsonPayload);
+        }
+
+        public bool HasProperty(string propertyName)
+        {
+            var property = _jsonDocument.RootElement
+                .EnumerateObject()
+                .FirstOrDefault(p => string.Compare(p.Name, propertyName, 
+                    StringComparison.OrdinalIgnoreCase) == 0);
+
+            return property.Value.ValueKind != JsonValueKind.Undefined;
+
+            // Cannot handle casing:
+            // return _jsonDocument.RootElement.TryGetProperty(propertyName, out _);
+        }
+    }
+    
+    /// <summary>
+    /// Checking the raw JSON in the HttpContext.Request.
+    /// </summary>
+    [HttpPatch("httpcontext/{id:int}")]
+    // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ReadableBodyStream]
+    public IActionResult HttpContextUpdateCustomer([FromRoute] int id, [FromBody] HttpContextPatchCustomerDto patch)
+    {
+        var customer = _customersRepository.Find(id);
+        
+        if (customer == null)
+            return NotFound();
+
+        var bodyReader = new BodyReader(Request);
+
+        if (bodyReader.HasProperty(nameof(HttpContextPatchCustomerDto.Name)))
+            customer.Name = patch.Name;
+        
+        if (bodyReader.HasProperty(nameof(HttpContextPatchCustomerDto.Gender)))
+            customer.Gender = patch.Gender;
+        
+        if (bodyReader.HasProperty(nameof(HttpContextPatchCustomerDto.Deleted)))
+            customer.Delete(patch.Deleted);
+
         customer = _customersRepository.Update(customer);
     
         if (customer == null)
