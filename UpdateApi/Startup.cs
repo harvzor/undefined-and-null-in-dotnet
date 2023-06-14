@@ -24,6 +24,9 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services
+            .AddRouting(options => options.LowercaseUrls = true);
+        
+        services
             .AddMvc()
             .AddSystemTextJsonMergePatch();
         
