@@ -1,6 +1,6 @@
-﻿namespace UpdateApi.Customer.Dtos.Input;
+﻿namespace UpdateApi.Dtos.Input.Patch;
 
-public class HttpContextPatchCustomerDto
+public class BasicCustomerPatchDto
 {
     public string Name { get; set; }
     

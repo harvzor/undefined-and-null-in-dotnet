@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using DotNext;
 using DotNext.Text.Json;
 
-namespace UpdateApi.Customer.Dtos.Input;
+namespace UpdateApi.Dtos.Input.Put;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class OptionalRequiredAttribute : ValidationAttribute

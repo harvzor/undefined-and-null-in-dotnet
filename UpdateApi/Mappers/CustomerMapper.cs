@@ -1,7 +1,7 @@
-﻿using UpdateApi.Customer.Dtos.Output;
-using UpdateApi.Customer.Entities;
+﻿using UpdateApi.Dtos.Output;
+using UpdateApi.Entities;
 
-namespace UpdateApi.Customer.Mappers;
+namespace UpdateApi.Mappers;
 
 public static class CustomerMapper
 {

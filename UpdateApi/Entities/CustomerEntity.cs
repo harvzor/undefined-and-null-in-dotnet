@@ -1,4 +1,4 @@
-﻿namespace UpdateApi.Customer.Entities;
+﻿namespace UpdateApi.Entities;
 
 public class CustomerEntity
 {

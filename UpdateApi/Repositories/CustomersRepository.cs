@@ -1,7 +1,6 @@
-﻿using UpdateApi.Customer.Dtos.Input;
-using UpdateApi.Customer.Entities;
+﻿using UpdateApi.Entities;
 
-namespace UpdateApi.Customer.Repositories;
+namespace UpdateApi.Repositories;
 
 public class CustomersRepository
 {

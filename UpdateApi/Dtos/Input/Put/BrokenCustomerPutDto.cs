@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace UpdateApi.Customer.Dtos.Input;
+namespace UpdateApi.Dtos.Input.Put;
 
 public class BrokenCustomerPutDto
 {

@@ -1,8 +1,8 @@
 ﻿using Harvzor.Optional;
 
-namespace UpdateApi.Customer.Dtos.Input;
+namespace UpdateApi.Dtos.Input.Patch;
 
-public class HarvzorOptionalCustomerPatchDto
+public class HavunenCustomerPatchDto
 {
     public Optional<string> Name { get; set; }
     

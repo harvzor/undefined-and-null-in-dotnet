@@ -3,11 +3,12 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Morcatko.AspNetCore.JsonMergePatch;
 using UpdateApi.Attributes;
-using UpdateApi.Customer.Dtos.Input;
-using UpdateApi.Customer.Mappers;
-using UpdateApi.Customer.Repositories;
+using UpdateApi.Dtos.Input.Patch;
+using UpdateApi.Dtos.Input.Put;
+using UpdateApi.Mappers;
+using UpdateApi.Repositories;
 
-namespace UpdateApi.Customer.Controllers;
+namespace UpdateApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -99,7 +100,7 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpPatch("Havunen/{id:int}")]
     [Consumes("application/json-patch+json ")]
-    public IActionResult HavunenPatch([FromRoute] int id, [FromBody] SystemTextJsonPatch.JsonPatchDocument<HavunenPatchCustomerDto> patch)
+    public IActionResult HavunenPatch([FromRoute] int id, [FromBody] SystemTextJsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
     {
         var customer = _customersRepository.Find(id);
         
@@ -112,7 +113,7 @@ public class CustomersController : ControllerBase
         // Example of how to read the operations:
         // All of the other properties would also have to be handled.
         var nameOperation = patch.Operations
-            .Find(x => String.Equals(x.Path, "/" + nameof(MorcatkoPatchCustomerDto.Name), StringComparison.OrdinalIgnoreCase));
+            .Find(x => String.Equals(x.Path, "/" + nameof(BasicCustomerPatchDto.Name), StringComparison.OrdinalIgnoreCase));
         if (nameOperation != null)
         {
             var name = (string)nameOperation.Value;
@@ -133,7 +134,7 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpPatch("{id:int}")]
     [Consumes("application/json-patch+json ")]
-    public IActionResult Patch([FromRoute] int id, [FromBody] Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<MicrosoftPatchCustomerDto> patch)
+    public IActionResult Patch([FromRoute] int id, [FromBody] Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
     {
         var customer = _customersRepository.Find(id);
         
@@ -159,7 +160,7 @@ public class CustomersController : ControllerBase
     /// </remarks>
     [HttpPatch("morcatko/{id:int}")]
     [Consumes(JsonMergePatchDocument.ContentType)]
-    public IActionResult MorcatkoPatch([FromRoute] int id, [FromBody] JsonMergePatchDocument<MorcatkoPatchCustomerDto> patch)
+    public IActionResult MorcatkoPatch([FromRoute] int id, [FromBody] JsonMergePatchDocument<BasicCustomerPatchDto> patch)
     {
         var customer = _customersRepository.Find(id);
         
@@ -173,7 +174,7 @@ public class CustomersController : ControllerBase
         // This is JSON Merge PATCH so I don't need to look out for operations that aren't matching Replace.
         // I lose out on nice strong typing:
         var nameOperation = patch.Operations
-            .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Name), StringComparison.OrdinalIgnoreCase));
+            .Find(x => String.Equals(x.path, "/" + nameof(BasicCustomerPatchDto.Name), StringComparison.OrdinalIgnoreCase));
         if (nameOperation != null)
         {
             var name = (string)nameOperation.value;
@@ -181,7 +182,7 @@ public class CustomersController : ControllerBase
         }
         
         var genderOperation = patch.Operations
-            .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Gender), StringComparison.OrdinalIgnoreCase));
+            .Find(x => String.Equals(x.path, "/" + nameof(BasicCustomerPatchDto.Gender), StringComparison.OrdinalIgnoreCase));
         if (genderOperation != null)
         {
             var gender = (string?)genderOperation.value;
@@ -189,7 +190,7 @@ public class CustomersController : ControllerBase
         }
     
         var deleteOperation = patch.Operations
-            .Find(x => String.Equals(x.path, "/" + nameof(MorcatkoPatchCustomerDto.Deleted), StringComparison.OrdinalIgnoreCase));
+            .Find(x => String.Equals(x.path, "/" + nameof(BasicCustomerPatchDto.Deleted), StringComparison.OrdinalIgnoreCase));
         if (deleteOperation != null)
         {
             var deleted = (bool)deleteOperation.value;
@@ -240,7 +241,7 @@ public class CustomersController : ControllerBase
     // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
     [Consumes(MediaTypeNames.Application.Json)]
     [ReadableBodyStream]
-    public IActionResult HttpContextUpdateCustomer([FromRoute] int id, [FromBody] HttpContextPatchCustomerDto patch)
+    public IActionResult HttpContextUpdateCustomer([FromRoute] int id, [FromBody] BasicCustomerPatchDto customerPatch)
     {
         var customer = _customersRepository.Find(id);
         
@@ -249,14 +250,14 @@ public class CustomersController : ControllerBase
 
         var bodyReader = new BodyReader(Request);
 
-        if (bodyReader.HasProperty(nameof(HttpContextPatchCustomerDto.Name)))
-            customer.Name = patch.Name;
+        if (bodyReader.HasProperty(nameof(BasicCustomerPatchDto.Name)))
+            customer.Name = customerPatch.Name;
         
-        if (bodyReader.HasProperty(nameof(HttpContextPatchCustomerDto.Gender)))
-            customer.Gender = patch.Gender;
+        if (bodyReader.HasProperty(nameof(BasicCustomerPatchDto.Gender)))
+            customer.Gender = customerPatch.Gender;
         
-        if (bodyReader.HasProperty(nameof(HttpContextPatchCustomerDto.Deleted)))
-            customer.Delete(patch.Deleted);
+        if (bodyReader.HasProperty(nameof(BasicCustomerPatchDto.Deleted)))
+            customer.Delete(customerPatch.Deleted);
 
         customer = _customersRepository.Update(customer);
     
@@ -272,7 +273,7 @@ public class CustomersController : ControllerBase
     [HttpPatch("harvzor-optional/{id:int}")]
     // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
     [Consumes(MediaTypeNames.Application.Json)]
-    public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HarvzorOptionalCustomerPatchDto patch)
+    public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HavunenCustomerPatchDto patch)
     {
         var customer = _customersRepository.Find(id);
         
