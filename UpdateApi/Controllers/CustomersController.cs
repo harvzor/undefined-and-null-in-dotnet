@@ -67,38 +67,12 @@ public class CustomersController : ControllerBase
         
         return Ok(customer.Map());
     }
-    
-    /// <summary>
-    /// DotNext.Optional doesn't allow me to use `[Required]` to ensure not undefined.
-    /// </summary>
-    [HttpPut("dotnextoptional/{id:int}")]
-    public IActionResult DotNextOptionalUpdateCustomer([FromRoute] int id, [FromBody] DotNextOptionalCustomerPutDto dotNextOptionalCustomerPutDto)
-    {
-        var customer = _customersRepository.Find(id);
-    
-        if (customer == null)
-            return NotFound();
-        
-        customer.Name = dotNextOptionalCustomerPutDto.Name;
-        
-        if (dotNextOptionalCustomerPutDto.Gender.HasValue)
-            customer.Gender = dotNextOptionalCustomerPutDto.Gender.OrDefault();
-        
-        customer.Delete(dotNextOptionalCustomerPutDto.Deleted);
-        
-        customer = _customersRepository.Update(customer);
-        
-        if (customer == null)
-            return StatusCode(500);
-        
-        return Ok(customer.Map());
-    }
-    
+
     /// <summary>
     /// https://github.com/Havunen/SystemTextJsonPatch
     /// Preferable to using Microsoft.AspNetCore.JsonPatch.JsonPatchDocument as it works well with System.Text.Json.
     /// </summary>
-    [HttpPatch("Havunen/{id:int}")]
+    [HttpPatch("havunen/{id:int}")]
     [Consumes("application/json-patch+json ")]
     public IActionResult HavunenPatch([FromRoute] int id, [FromBody] SystemTextJsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
     {
@@ -129,12 +103,13 @@ public class CustomersController : ControllerBase
     }
     
     /// <summary>
+    /// Using Microsoft.AspNetCore.JsonPatch
     /// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0
     /// This should work, but the Swagger docs will all be broken with no clear fix: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/2094
     /// </summary>
-    [HttpPatch("{id:int}")]
+    [HttpPatch("microsoft/{id:int}")]
     [Consumes("application/json-patch+json ")]
-    public IActionResult Patch([FromRoute] int id, [FromBody] Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
+    public IActionResult MicrosoftPatch([FromRoute] int id, [FromBody] Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
     {
         var customer = _customersRepository.Find(id);
         
@@ -268,12 +243,43 @@ public class CustomersController : ControllerBase
     }
     
     /// <summary>
+    /// DotNext.Optional doesn't work with nullable types (`T?`) as it says explicit `null` is not a real value.
+    /// </summary>
+    [HttpPatch("dotnextoptional/{id:int}")]
+    // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
+    [Consumes(MediaTypeNames.Application.Json)]
+    public IActionResult DotNextOptionalUpdateCustomer([FromRoute] int id, [FromBody] DotNextOptionalCustomerPatchDto dotNextOptionalCustomerPatchDto)
+    {
+        var customer = _customersRepository.Find(id);
+    
+        if (customer == null)
+            return NotFound();
+        
+        if (dotNextOptionalCustomerPatchDto.Name.HasValue)
+            customer.Name = dotNextOptionalCustomerPatchDto.Name.Value;
+        
+        // HasValue doesn't work on `T?` as it thinks that explicit `null` is not an intentional value.
+        if (dotNextOptionalCustomerPatchDto.Gender.HasValue)
+            customer.Gender = dotNextOptionalCustomerPatchDto.Gender.Value;
+        
+        if (dotNextOptionalCustomerPatchDto.Deleted.HasValue)
+            customer.Delete(dotNextOptionalCustomerPatchDto.Deleted.Value);
+        
+        customer = _customersRepository.Update(customer);
+        
+        if (customer == null)
+            return StatusCode(500);
+        
+        return Ok(customer.Map());
+    }
+    
+    /// <summary>
     /// Using Harvzor.Optional
     /// </summary>
     [HttpPatch("harvzor-optional/{id:int}")]
     // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
     [Consumes(MediaTypeNames.Application.Json)]
-    public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HavunenCustomerPatchDto patch)
+    public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HarvzorOptionalCustomerPatchDto patch)
     {
         var customer = _customersRepository.Find(id);
         

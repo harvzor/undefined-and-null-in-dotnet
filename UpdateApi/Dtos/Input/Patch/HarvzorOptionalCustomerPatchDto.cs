@@ -2,7 +2,7 @@
 
 namespace UpdateApi.Dtos.Input.Patch;
 
-public class HavunenCustomerPatchDto
+public class HarvzorOptionalCustomerPatchDto
 {
     public Optional<string> Name { get; set; }
     
