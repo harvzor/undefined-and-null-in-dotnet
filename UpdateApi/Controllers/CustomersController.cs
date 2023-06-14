@@ -17,6 +17,7 @@ public class CustomersController : ControllerBase
 {
     private readonly CustomersRepository _customersRepository;
     private const string JsonPatchContentType = "application/json-patch+json";
+    private const string JsonMergePatchContentType = "application/merge-patch+json";
 
     public CustomersController()
     {
@@ -278,8 +279,8 @@ public class CustomersController : ControllerBase
     /// Using Harvzor.Optional
     /// </summary>
     [HttpPatch("harvzor-optional/{id:int}")]
-    // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
-    [Consumes(JsonPatchContentType)]
+    [Consumes(JsonMergePatchContentType)] // No idea why this causes an issue.
+    // [Consumes(JsonPatchContentType)]
     public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HarvzorOptionalCustomerPatchDto patch)
     {
         var customer = _customersRepository.Find(id);
