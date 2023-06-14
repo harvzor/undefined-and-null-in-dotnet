@@ -16,6 +16,7 @@ namespace UpdateApi.Controllers;
 public class CustomersController : ControllerBase
 {
     private readonly CustomersRepository _customersRepository;
+    private const string JsonPatchContentType = "application/json-patch+json";
 
     public CustomersController()
     {
@@ -73,7 +74,7 @@ public class CustomersController : ControllerBase
     /// Preferable to using Microsoft.AspNetCore.JsonPatch.JsonPatchDocument as it works well with System.Text.Json.
     /// </summary>
     [HttpPatch("havunen/{id:int}")]
-    [Consumes("application/json-patch+json ")]
+    [Consumes(JsonPatchContentType)]
     public IActionResult HavunenPatch([FromRoute] int id, [FromBody] SystemTextJsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
     {
         var customer = _customersRepository.Find(id);
@@ -108,7 +109,7 @@ public class CustomersController : ControllerBase
     /// This should work, but the Swagger docs will all be broken with no clear fix: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/2094
     /// </summary>
     [HttpPatch("microsoft/{id:int}")]
-    [Consumes("application/json-patch+json ")]
+    [Consumes(JsonPatchContentType)]
     public IActionResult MicrosoftPatch([FromRoute] int id, [FromBody] Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<BasicCustomerPatchDto> patch)
     {
         var customer = _customersRepository.Find(id);
@@ -214,7 +215,7 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpPatch("httpcontext/{id:int}")]
     // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(JsonPatchContentType)]
     [ReadableBodyStream]
     public IActionResult HttpContextUpdateCustomer([FromRoute] int id, [FromBody] BasicCustomerPatchDto customerPatch)
     {
@@ -247,7 +248,7 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpPatch("dotnextoptional/{id:int}")]
     // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(JsonPatchContentType)]
     public IActionResult DotNextOptionalUpdateCustomer([FromRoute] int id, [FromBody] DotNextOptionalCustomerPatchDto dotNextOptionalCustomerPatchDto)
     {
         var customer = _customersRepository.Find(id);
@@ -278,7 +279,7 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpPatch("harvzor-optional/{id:int}")]
     // [Consumes("application/merge-patch+json")] // No idea why this causes an issue.
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(JsonPatchContentType)]
     public IActionResult HarvzorOptionalUpdateCustomer([FromRoute] int id, [FromBody] HarvzorOptionalCustomerPatchDto patch)
     {
         var customer = _customersRepository.Find(id);
